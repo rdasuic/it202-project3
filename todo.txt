@@ -1,0 +1,25 @@
+ - player obj
+    - health
+    - player x/y 
+    - score
+    - # of harm obj hit
+    - # of benefit obj hit
+    - player speed
+    - lives
+- game obj
+    - level(?)
+    - encapsulate player obj?
+    
+- Loop
+    - clear
+    - update
+    - handle conditions
+        - edge conditions (ie obj at edge of screen)
+        - collision detection
+    - paint new state
+    - reqAnimFrame()
+- music
+    - looping bg music
+    - increase tempo when player health is low
+    - diff sounds for collision w/ benefit/harm objs
+    
