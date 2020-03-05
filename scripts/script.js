@@ -1,5 +1,5 @@
 const canvas = document.querySelector("#game"), ctx = canvas.getContext("2d");
-
+canvas.focus()
 let player = {
     health: 100,
     x: 0,
@@ -8,7 +8,8 @@ let player = {
     harmsHit: 0,
     benefitsHit: 0,
     speed: 1,
-    lives: 9
+    lives: 9,
+    width: playerSprite.width
 }
 let game = {
     player: player,
@@ -21,7 +22,9 @@ let benefitObjs = [
         id: "starbucks",
         img: "sb.png",
         pointValue: 10,
-        y: 150
+        y: 0,
+        x: 150,
+        width: benefitObj1Sprite.width
     },
     {
         id: "starbucks",
@@ -59,21 +62,16 @@ document.addEventListener('keyup', (ev) => {
     else if (kc === 39) keys.right = false;
     else if (kc === 40) keys.down = false;
 })
-// loads in the player sprite
-let playerSprite = new Image();
-playerSprite.src = "./assets/dog.png";
-playerSprite.addEventListener('load', () => {
-    // the game 'starts' after the player sprite loads in
-    window.requestAnimationFrame(draw);
-}, false)
-let benefitObj1Sprite = new Image();
-benefitObj1Sprite.src = "./assets/benefit/" + benefitObjs[0].img;
+
 
 const dropBenefitObj = (x,y) => {
     ctx.drawImage(benefitObj1Sprite, x, y, benefitObj1Sprite.naturalWidth*.3, benefitObj1Sprite.naturalHeight*.3);
 }
 const isPlayerCollidedWithObj = () => {
-    if(benefitObjs[0].y + benefitObj1Sprite.height <= playerSprite.height) {
+
+    if(!((benefitObjs[0].x > player.width + player.x) || (player.x > benefitObj1Sprite.width + benefitObjs[0].x)) && //checks x bounds
+       (benefitObjs[0].y - canvas.height + playerSprite.height >= 0)) { //checks y bounds
+        benefitObjs[0].y = 0;
         console.log("Hit");
     }
 }
@@ -81,7 +79,7 @@ const isPlayerCollidedWithObj = () => {
 // main game loop
 const draw = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(playerSprite, player.x, player.y, playerSprite.naturalWidth * .4, playerSprite.naturalHeight * .4);    
+    ctx.drawImage(playerSprite, player.x, player.y, playerSprite.naturalWidth * .25, playerSprite.naturalHeight * .25);    
     if(keys.left) {
         if(isPlayerEdgeCollision()) {
             player.x = player.x;
@@ -98,9 +96,13 @@ const draw = () => {
             player.x += player.speed;
         }
     }
-    benefitObjs[0].y+=0.5;
+    benefitObjs[0].y+=0.2;
     dropBenefitObj(150, benefitObjs[0].y);
     isPlayerCollidedWithObj();
+    // when the obj scrolls past the screen
+    if(benefitObjs[0].y == canvas.height) {
+        benefitObjs[0].y = 0;
+    }
     window.requestAnimationFrame(draw);
 }
 
