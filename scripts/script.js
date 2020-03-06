@@ -13,7 +13,7 @@ let player = {
 }
 let game = {
     level: 1,
-    state: 0 // 0 == alive, 1 == dead
+    state: 1 // 0 == alive, 1 == dead
 }
 
 const benefitObjs = [
@@ -43,8 +43,7 @@ const keys = {
     up: false,
     down: false,
     left: false,
-    right: false,
-    space: false
+    right: false
 }
 
 // sets init game obj locations
@@ -57,7 +56,11 @@ init();
 // detect keypress globally and modify the keypress obj
 document.addEventListener('keydown', (ev) => {
     let kc = ev.keyCode;
-    if (kc === 32) keys.space = true;
+    if(game.state == 1 && kc == 32) {
+        // start the game!
+        game.state = 0;
+        draw();
+    }
     else if (kc === 37) keys.left = true; 
     else if (kc === 38) keys.up = true;    
     else if (kc === 39) keys.right = true;
@@ -65,7 +68,6 @@ document.addEventListener('keydown', (ev) => {
 })
 document.addEventListener('keyup', (ev) => {
     let kc = ev.keyCode;
-    if (kc === 32) keys.space = false;
     else if (kc === 37) keys.left = false; 
     else if (kc === 38) keys.up = false;    
     else if (kc === 39) keys.right = false;
@@ -106,11 +108,16 @@ const showStartScreen = () => {
 }
 const showGameOverScreen = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "25px Helvetica";
+    ctx.font = "55px Helvetica";
     ctx.fillStyle = "Purple";
     ctx.fillText("You lost", 100, 400);
 }
-
+const drawScores = () => {
+    ctx.font = "30px Helvetica";
+    ctx.fillStyle = "Purple";
+    ctx.fillText("Score: " + player.score, 350, 50);
+    ctx.fillText("Lives: " + player.lives, 350, 80);
+}
 let currentBenefitObj = pickRandBenefitObj();
 let currentHarmObj = pickRandHarmObj();
 let randXForBenefit = Math.floor(Math.random()*canvas.width);
@@ -146,6 +153,7 @@ const draw = () => {
     // move the objs
     currentBenefitObj.y++;
     currentHarmObj.y++;
+    drawScores();
     if(isPlayerCollidedWithObj(currentBenefitObj)) {
         player.score++;
         currentBenefitObj.y = 0;
@@ -154,7 +162,9 @@ const draw = () => {
         currentBenefitObj.x = randXForBenefit;
     }
     if(isPlayerCollidedWithObj(currentHarmObj)) {
-        player.score--;
+        if(player.score > 0) {
+            player.score--;
+        }
         player.lives--;
         currentHarmObj.y = 0;
         currentHarmObj = pickRandHarmObj();
@@ -174,20 +184,14 @@ const draw = () => {
         currentHarmObj = pickRandHarmObj();
         randXForHarm = Math.floor(Math.random()*canvas.width);
         currentHarmObj.x = randXForHarm;
-        console.log(currentBenefitObj);
-        console.log(currentHarmObj);
     }
     if(player.lives <= 0) {
         window.cancelAnimationFrame(draw);
+        game.state = 1;
         showGameOverScreen();
     }
     window.requestAnimationFrame(draw);
 }
-// show the tutorial initially
-// showStartScreen();
-// // start the game loop 
-// if(keys.space) {
-//     console.log("press");
-//     draw();
-// }
-draw();
+// draw();
+showStartScreen();
+
