@@ -6,6 +6,12 @@ playerSprite.addEventListener('load', () => {
     // the game 'starts' after the player sprite loads in
     window.requestAnimationFrame(draw);
 }, false)
-//loads in the first benefit obj
-let benefitObj1Sprite = new Image();
-benefitObj1Sprite.src = "./assets/benefit/sb.png";
+//loads in the  benefit objs
+let sbSprite = new Image();
+sbSprite.src = "./assets/benefit/sb.png";
+
+let boneSprite = new Image();
+boneSprite.src = "./assets/benefit/bone.png";
+
+let rockSprite = new Image();
+rockSprite.src = "./assets/harm/rock.png";
