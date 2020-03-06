@@ -1,5 +1,5 @@
 const canvas = document.querySelector("#game"), ctx = canvas.getContext("2d");
-canvas.focus()
+canvas.focus();
 let player = {
     health: 100,
     x: 0,
@@ -38,12 +38,13 @@ const harmObjs = [
         y: 0
     },
 ]
-// obj of possible keys this canvas accepts
+// obj of possible keys the user can press
 const keys = {
     up: false,
     down: false,
     left: false,
-    right: false
+    right: false,
+    space: false
 }
 
 // sets init game obj locations
@@ -55,15 +56,17 @@ init();
 
 // detect keypress globally and modify the keypress obj
 document.addEventListener('keydown', (ev) => {
-    let kc = ev.keyCode
-    if (kc === 37) keys.left = true; 
+    let kc = ev.keyCode;
+    if (kc === 32) keys.space = true;
+    else if (kc === 37) keys.left = true; 
     else if (kc === 38) keys.up = true;    
     else if (kc === 39) keys.right = true;
     else if (kc === 40) keys.down = true;
 })
 document.addEventListener('keyup', (ev) => {
-    let kc = ev.keyCode
-    if (kc === 37) keys.left = false; 
+    let kc = ev.keyCode;
+    if (kc === 32) keys.space = false;
+    else if (kc === 37) keys.left = false; 
     else if (kc === 38) keys.up = false;    
     else if (kc === 39) keys.right = false;
     else if (kc === 40) keys.down = false;
@@ -84,13 +87,28 @@ const pickRandHarmObj = () => {
     return randHarmObj;
 }
 const isPlayerCollidedWithObj = (obj) => {
-//     return (!((benefitObjs[0].x > player.width + player.x) || (player.x > benefitObj1Sprite.width + benefitObjs[0].x)) && //checks x bounds
-//        (benefitObjs[0].y - benefitObj1Sprite.height + playerSprite.height >= 0))  //checks y bounds   
     return (!((obj.x > player.width + player.x) || (player.x > obj.spriteId.width + obj.x)) && //checks x bounds
        (obj.y - obj.spriteId.height + playerSprite.height >= 0))  //checks y bounds 
 }
+const isPlayerLeftEdgeCollision = () => {
+    return (player.x <= 0) 
+}
+const isPlayerRightEdgeCollison = () => {
+    return (playerSprite.width - player.x <= 0)
+}
 const showStartScreen = () => {
-    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "15px Helvetica";
+    ctx.fillStyle = "Purple";
+    ctx.fillText("Use the left and right arrow keys to hit harm/benefit objects", 100, 400);
+    ctx.fillText("Take a guess as to which objects might help or hurt you!", 100, 500);
+    ctx.fillText("Press the spacebar to start", 250, 600);
+}
+const showGameOverScreen = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "25px Helvetica";
+    ctx.fillStyle = "Purple";
+    ctx.fillText("You lost", 100, 400);
 }
 
 let currentBenefitObj = pickRandBenefitObj();
@@ -159,14 +177,17 @@ const draw = () => {
         console.log(currentBenefitObj);
         console.log(currentHarmObj);
     }
+    if(player.lives <= 0) {
+        window.cancelAnimationFrame(draw);
+        showGameOverScreen();
+    }
     window.requestAnimationFrame(draw);
 }
-
+// show the tutorial initially
+// showStartScreen();
+// // start the game loop 
+// if(keys.space) {
+//     console.log("press");
+//     draw();
+// }
 draw();
-
-const isPlayerLeftEdgeCollision = () => {
-    return (player.x <= 0) 
-}
-const isPlayerRightEdgeCollison = () => {
-    return (playerSprite.width - player.x <= 0)
-}
